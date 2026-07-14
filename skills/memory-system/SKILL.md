@@ -135,3 +135,79 @@ Truncate to 16 hex chars (64 bits) — sufficient for tamper detection, compact.
 - Never delete blocks — mark as deprecated with a new block
 - Never skip the hash chain — it's the provenance backbone
 - Never put raw user input in FACT without source tagging
+
+---
+
+## VECTOR EMBEDDINGS
+
+Semantic search using sentence-transformers with `all-MiniLM-L6-v2` (384-dim).
+
+### Index Location
+
+```
+.opencode/memory/embeddings/
+├── index.faiss         # FAISS index
+├── ids.json            # Index position → block ID mapping
+└── meta.json           # Model info, count
+```
+
+### CLI Usage
+
+```bash
+sint-embeddings index       # Build/update index from all blocks
+sint-embeddings search "query"  # Semantic search (top 10)
+sint-embeddings similar 0005 5  # Find 5 blocks similar to 0005
+```
+
+### MCP Tools
+
+- `embeddings_index()`: Build/update the FAISS index
+- `embeddings_search(query, limit)`: Semantic search
+- `embeddings_similar(block_id, limit)`: Find similar blocks
+
+### Integration
+
+Use semantic search alongside text search for comprehensive retrieval:
+- Text search: Exact matches, regex patterns, fast
+- Semantic search: Conceptual similarity, fuzzy matching
+
+---
+
+## GIT INTEGRATION
+
+Memory blocks are linked to git commits via timestamp proximity.
+
+### Git Links
+
+```
+.opencode/memory/git_links.jsonl  # Links between blocks and commits
+```
+
+Each link records:
+- `block_id`: Memory block identifier
+- `commit_hash`: Git commit SHA
+- `time_diff_seconds`: Time between commit and block creation
+
+### CLI Usage
+
+```bash
+sint git link         # Link blocks to recent commits
+sint git trace 0042   # Trace block through git history
+sint git timeline     # Combined block + commit timeline
+sint git info         # Current commit details
+sint git stats        # Git integration statistics
+```
+
+### MCP Tools
+
+- `git_link_blocks()`: Link blocks to commits
+- `git_trace_block(block_id)`: Trace block through git history
+- `git_timeline(project, limit)`: Combined timeline
+- `git_commit_info()`: Current commit details
+
+### Provenance Trail
+
+Git commits become provenance nodes. The full trail:
+1. Block created → linked to commit via timestamp
+2. `git trace` shows all commits related to a block
+3. `git timeline` shows interleaved memory + git events
