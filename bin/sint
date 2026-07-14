@@ -18,6 +18,11 @@ Usage:
   sint trace <id>      — Provenance archaeology
   sint tree <id>       — Dependency tree
 
+  sint git link        — Link memory blocks to git commits
+  sint git trace <id>  — Trace block through git history
+  sint git timeline    — Combined memory + git timeline
+  sint git info        — Show current commit info
+
   sint dashboard       — Full dashboard view
   sint help            — Show help
 """
@@ -481,6 +486,11 @@ def main():
         cmd_drift()
     elif args[0] == "trace":
         cmd_trace(args[1]) if len(args) > 1 else print("Usage: sint trace <id>")
+    elif args[0] == "git":
+        # Delegate to sint-git
+        import subprocess
+        git_script = Path(__file__).parent / "sint-git"
+        subprocess.run([sys.executable, str(git_script)] + args[1:])
     elif args[0] == "dashboard":
         cmd_dashboard()
     else:

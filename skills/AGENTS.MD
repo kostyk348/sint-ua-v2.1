@@ -502,6 +502,77 @@ Use `/memory` to manually query memory system.
 
 ---
 
+## 14. GIT INTEGRATION
+
+Memory blocks are linked to git commits via timestamp proximity. Commits become provenance nodes in the audit trail.
+
+### Git Links
+
+```
+.opencode/memory/git_links.jsonl  # Links between blocks and commits
+```
+
+Each link records:
+- `block_id`: Memory block identifier
+- `commit_hash`: Git commit SHA
+- `time_diff_seconds`: Time between commit and block creation
+- `linked_at`: When the link was created
+
+### Usage
+
+```bash
+sint git link         # Link blocks to recent commits
+sint git trace <id>   # Trace block through git history
+sint git timeline     # Combined block + commit timeline
+sint git info         # Show current commit
+```
+
+### MCP Tools
+
+- `git_link_blocks()`: Link blocks to commits
+- `git_trace_block(block_id)`: Trace block through git history
+- `git_timeline(project, limit)`: Combined timeline
+- `git_commit_info()`: Current commit details
+
+---
+
+## 15. VECTOR EMBEDDINGS
+
+Semantic search using sentence-transformers with `all-MiniLM-L6-v2` model (384-dim).
+
+### Embedding Index
+
+```
+.opencode/memory/embeddings/
+├── index.faiss         # FAISS index for similarity search
+├── ids.json            # Mapping from index position to block ID
+└── meta.json           # Model info, indexed count
+```
+
+### Usage
+
+```bash
+sint-embeddings index      # Build/update embedding index
+sint-embeddings search <q> # Semantic search (returns top 10)
+sint-embeddings similar <id> [n]  # Find N similar blocks
+```
+
+### MCP Tools
+
+- `embeddings_index()`: Build/update index
+- `embeddings_search(query, limit)`: Semantic search
+- `embeddings_similar(block_id, limit)`: Find similar blocks
+
+### Integration with Text Search
+
+Text search (grep-based) and semantic search (embedding-based) are complementary:
+- Text search: Exact matches, regex, fast
+- Semantic search: Conceptual similarity, fuzzy matching
+
+Use both for comprehensive retrieval.
+
+---
+
 *End of AGENTS.MD v2.1*  
 *This document should be versioned alongside the codebase it serves.*  
 *Update triggers: new agent role, new tool, discovered failure mode, verified pattern, invalidated pattern.*

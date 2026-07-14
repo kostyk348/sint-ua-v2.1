@@ -522,5 +522,197 @@ def memory_trace_provenance(block_id: str) -> dict:
     }
 
 
+# --- Git Integration Tools ---
+
+GIT_LINKS_FILE = MEMORY_DIR / "git_links.jsonl"
+
+
+def _run_git(args: list, cwd: str = None) -> str:
+    """Run git command and return output."""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["git"] + args,
+            capture_output=True,
+            text=True,
+            cwd=cwd or os.getcwd()
+        )
+        return result.stdout.strip()
+    except Exception as e:
+        return ""
+
+
+@mcp.tool()
+def git_link_blocks() -> str:
+    """Link memory blocks to git commits based on timestamps.
+    
+    Scans recent commits and links blocks created around the same time.
+    Returns the number of new links created.
+    """
+    commits = []
+    output = _run_git(["log", "-50", "--format=%H|%s|%ai|%an"])
+    if output:
+        for line in output.split("\n"):
+            if "|" in line:
+                parts = line.split("|", 3)
+                if len(parts) >= 3:
+                    commits.append({
+                        "hash": parts[0],
+                        "message": parts[1],
+                        "date": parts[2],
+                        "author": parts[3] if len(parts) > 3 else "unknown"
+                    })
+    
+    if not commits:
+        return "No git commits found."
+    
+    existing_links = {}
+    if GIT_LINKS_FILE.exists():
+        for line in GIT_LINKS_FILE.read_text().strip().split("\n"):
+            if line.strip():
+                link = json.loads(line)
+                existing_links[link["block_id"]] = link
+    
+    blocks = {}
+    for f in BLOCKS_DIR.glob("*.json"):
+        try:
+            block = json.loads(f.read_text())
+            blocks[block["id"]] = block
+        except:
+            pass
+    
+    new_links = 0
+    for bid, block in blocks.items():
+        if bid in existing_links:
+            continue
+        
+        block_ts = block.get("timestamp", "")
+        if not block_ts:
+            continue
+        
+        try:
+            block_time = datetime.fromisoformat(block_ts.replace("Z", "+00:00")).replace(tzinfo=None)
+        except:
+            continue
+        
+        for commit in commits:
+            try:
+                commit_time = datetime.strptime(commit["date"][:19], "%Y-%m-%d %H:%M:%S")
+                diff = (block_time - commit_time).total_seconds()
+                if -3600 <= diff <= 7200:
+                    link = {
+                        "block_id": bid,
+                        "commit_hash": commit["hash"],
+                        "commit_message": commit["message"],
+                        "commit_date": commit["date"],
+                        "block_timestamp": block_ts,
+                        "time_diff_seconds": diff,
+                        "linked_at": datetime.now().isoformat()
+                    }
+                    
+                    with open(GIT_LINKS_FILE, "a") as f:
+                        f.write(json.dumps(link, ensure_ascii=False) + "\n")
+                    
+                    existing_links[bid] = link
+                    new_links += 1
+                    break
+            except:
+                continue
+    
+    return f"Linked {new_links} new blocks. Total links: {len(existing_links)}"
+
+
+@mcp.tool()
+def git_trace_block(block_id: str) -> str:
+    """Trace a memory block through git history.
+    
+    Shows git commits linked to the block and nearby commits.
+    """
+    links = []
+    if GIT_LINKS_FILE.exists():
+        for line in GIT_LINKS_FILE.read_text().strip().split("\n"):
+            if line.strip():
+                link = json.loads(line)
+                if link["block_id"] == block_id:
+                    links.append(link)
+    
+    if not links:
+        return f"No git links found for block {block_id}."
+    
+    result = [f"Git Links for {block_id}:"]
+    for link in links:
+        result.append(f"  {link.get('commit_hash', '?')[:8]}")
+        result.append(f"    {link.get('commit_message', '?')}")
+        result.append(f"    {link.get('commit_date', '?')}")
+        if "time_diff_seconds" in link:
+            diff = link["time_diff_seconds"]
+            result.append(f"    Time diff: {diff:.0f}s")
+    
+    return "\n".join(result)
+
+
+@mcp.tool()
+def git_timeline(project: Optional[str] = None, limit: int = 20) -> str:
+    """Get combined timeline of memory blocks and git commits.
+    
+    Returns interleaved events sorted by time.
+    """
+    events = []
+    
+    # Memory blocks
+    for f in BLOCKS_DIR.glob("*.json"):
+        try:
+            block = json.loads(f.read_text())
+            if project and block.get("project") != project:
+                continue
+            events.append({
+                "type": "block",
+                "id": block["id"],
+                "timestamp": block.get("timestamp", ""),
+                "register": block.get("register", ""),
+                "content": block.get("content", "")[:60]
+            })
+        except:
+            pass
+    
+    # Git commits
+    output = _run_git(["log", f"-{limit}", "--format=%H|%s|%ai|%an"])
+    if output:
+        for line in output.split("\n"):
+            if "|" in line:
+                parts = line.split("|", 3)
+                if len(parts) >= 3:
+                    events.append({
+                        "type": "commit",
+                        "hash": parts[0][:8],
+                        "timestamp": parts[2],
+                        "message": parts[1][:60]
+                    })
+    
+    events.sort(key=lambda e: e.get("timestamp", ""), reverse=True)
+    
+    result = ["Combined Timeline:"]
+    for event in events[:limit]:
+        if event["type"] == "block":
+            result.append(f"  {event.get('timestamp', '?')[:19]}  BLOCK {event['id']} {event.get('register', '?')}")
+            result.append(f"    {event.get('content', '')}")
+        else:
+            result.append(f"  {event.get('timestamp', '?')[:19]}  COMMIT {event.get('hash', '?')}")
+            result.append(f"    {event.get('message', '')}")
+    
+    return "\n".join(result)
+
+
+@mcp.tool()
+def git_commit_info() -> str:
+    """Show information about the current git commit."""
+    output = _run_git(["log", "-1", "--format=%H%n%s%n%ai%n%an"])
+    if not output:
+        return "No git commits found."
+    
+    lines = output.split("\n")
+    return f"Commit: {lines[0][:8]}\nMessage: {lines[1]}\nDate: {lines[2]}\nAuthor: {lines[3]}"
+
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
