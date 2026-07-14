@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "last_updated": "2026-07-14T19:00:00.000000Z",
+  "focus": [
+    {
+      "project": "SINT-UA",
+      "task": "SINT-UA v2.1 memory system with vector embeddings + git integration",
+      "status": "completed"
+    },
+    {
+      "project": "DSA",
+      "task": "add DSP chain + 3D spatialization to mixer; then git init + push to GitHub",
+      "status": "in_progress"
+    }
+  ],
+  "pending_decisions": [
+    {
+      "id": "d1",
+      "question": "100 OJ RE approach",
+      "context": "what order to reverse subsystems? (pak format → asset loading → audio → rendering → gameplay)",
+      "created": "2026-07-14"
+    },
+    {
+      "id": "d2",
+      "question": "AGT scope",
+      "context": "just audio, or full board-game constructor engine?",
+      "created": "2026-07-14"
+    },
+    {
+      "id": "d3",
+      "question": "data.ojd full content",
+      "context": "(a) RE `logiovfs` VFS `xRead` to extract key/algorithm → decrypt the full 1,339,392-B ciphertext offline (no display needed); OR (b) run game to a state that reads all 327 pages (needs Xvfb/display — not installed). Option (a) preferred.",
+      "created": "2026-07-14"
+    }
+  ],
+  "session_count": 2,
+  "last_session": "2026-07-14a",
+  "migrated_from": "STATE.MD",
+  "migration_date": "2026-07-14T18:28:32.729723Z"
+}
