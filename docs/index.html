@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINT-UA v2.1 — Agent Memory System</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --fg: #c9d1d9;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --yellow: #d29922;
+            --red: #f85149;
+            --purple: #bc8cff;
+            --border: #30363d;
+            --card: #161b22;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Hero */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--fg);
+            max-width: 600px;
+            margin: 0 auto 32px;
+            opacity: 0.8;
+        }
+        .hero-links {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--card);
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+
+        /* Architecture */
+        .arch {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .arch h2 {
+            font-size: 2rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .arch-diagram {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre;
+            color: var(--green);
+        }
+
+        /* Features */
+        .features {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .features h2 {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.2s;
+        }
+        .feature-card:hover { border-color: var(--accent); }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        .feature-card p {
+            color: var(--fg);
+            opacity: 0.8;
+        }
+        .feature-tag {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+
+        /* Registers */
+        .registers {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .registers h2 {
+            font-size: 2rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .register-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .register-table th,
+        .register-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .register-table th {
+            background: var(--card);
+            font-weight: 600;
+        }
+        .register-table tr:hover { background: var(--card); }
+        .reg-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .reg-sense { background: rgba(63, 185, 80, 0.2); color: var(--green); }
+        .reg-fact { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+        .reg-logic { background: rgba(210, 153, 34, 0.2); color: var(--yellow); }
+        .reg-opinion { background: rgba(248, 81, 73, 0.2); color: var(--red); }
+        .reg-action { background: rgba(188, 140, 255, 0.2); color: var(--purple); }
+
+        /* CLI Demo */
+        .cli-demo {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .cli-demo h2 {
+            font-size: 2rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .terminal {
+            background: #1a1b26;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: #24283b;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: #f7768e; }
+        .terminal-dot.yellow { background: #e0af68; }
+        .terminal-dot.green { background: #9ece6a; }
+        .terminal-title {
+            margin-left: 8px;
+            color: #565f89;
+            font-size: 0.85rem;
+        }
+        .terminal-body {
+            padding: 20px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .terminal-body .prompt { color: var(--green); }
+        .terminal-body .cmd { color: var(--accent); }
+        .terminal-body .output { color: #a9b1d6; }
+        .terminal-body .highlight { color: var(--yellow); }
+        .terminal-body .dim { color: #565f89; }
+
+        /* Stats */
+        .stats {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            text-align: center;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--fg);
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--fg);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="container">
+        <h1>SINT-UA v2.1</h1>
+        <p>Structured agent memory with hash-chain provenance, temporal decay, drift detection, and provenance archaeology.</p>
+        <div class="hero-links">
+            <a href="https://github.com/kostyk348/sint-ua-v2.1" class="btn btn-primary">View on GitHub</a>
+            <a href="https://github.com/kostyk348/sint-ua-v2.1#setup" class="btn btn-secondary">Get Started</a>
+        </div>
+    </div>
+</div>
+
+<div class="arch">
+    <div class="container">
+        <h2>Architecture</h2>
+        <div class="arch-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    sint-main (primary agent)                 │
+│  Auto-reads memory → Classifies task → Delegates            │
+└─────────┬──────────────────────┬────────────────────────────┘
+          │                      │
+          ▼                      ▼
+┌─────────────────┐    ┌─────────────────┐
+│ sint-critic     │    │ sint-scribe     │
+│ • Verification  │    │ • Memory ops    │
+│ • Fact-check    │    │ • Block I/O     │
+│ • Code review   │    │ • Chain verify  │
+└─────────────────┘    └─────────────────┘
+          │                      │
+          └──────────┬───────────┘
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  sint-memory MCP Server                     │
+│  16 tools: read/write/search/verify/decay/drift/trace       │
+└─────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│               Hash-Chain Memory (.opencode/memory/)         │
+│  blocks/*.json — chain.jsonl — state.json — sessions/       │
+└─────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 sint-hooks (Plugin)                         │
+│  • tool.execute.after → auto-log findings                  │
+│  • chat.system.transform → inject memory context           │
+│  • session.compacting → preserve across compaction          │
+└─────────────────────────────────────────────────────────────┘</div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="container">
+        <h2>What Makes It Different</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>Hash-Chain Provenance</h3>
+                <p>Every memory block is cryptographically linked to the previous. Tamper any block — all subsequent hashes break. Full audit trail, no trust required.</p>
+                <span class="feature-tag">Cryptographic</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Temporal Decay</h3>
+                <p>Memory blocks cool down over time like human neurons. Recently accessed knowledge stays hot, old unused facts fade. Never deleted, just forgotten.</p>
+                <span class="feature-tag">Novel</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Drift Detection</h3>
+                <p>Monitors register distribution across sessions. Catches when agent starts expressing opinions as facts or losing confidence. Cross-session anomaly alerts.</p>
+                <span class="feature-tag">Unique</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏛️</div>
+                <h3>Provenance Archaeology</h3>
+                <p>Trace any decision back to its root facts. "Why did we decide X?" → full reasoning chain reconstructed from the hash chain.</p>
+                <span class="feature-tag">Debugging</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Auto-Triggering Agents</h3>
+                <p>sint-main runs automatically as primary agent. Plugin hooks auto-log findings. MCP server provides 16 memory tools. No manual invocation needed.</p>
+                <span class="feature-tag">Automatic</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Semantic Registers</h3>
+                <p>Every output typed: SENSE (raw), FACT (verified), LOGIC (inference), OPINION (subjective), ACTION (plan). Mixing without labeling = failure.</p>
+                <span class="feature-tag">SINT-UA</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="registers">
+    <div class="container">
+        <h2>Semantic Registers</h2>
+        <table class="register-table">
+            <thead>
+                <tr>
+                    <th>Register</th>
+                    <th>Definition</th>
+                    <th>Requirement</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="reg-badge reg-sense">SENSE</span></td>
+                    <td>Raw data, observation, user input</td>
+                    <td>No interpretation added</td>
+                </tr>
+                <tr>
+                    <td><span class="reg-badge reg-fact">FACT</span></td>
+                    <td>Verifiable claim about the world</td>
+                    <td>Source required</td>
+                </tr>
+                <tr>
+                    <td><span class="reg-badge reg-logic">LOGIC</span></td>
+                    <td>Deductive inference from FACT/SENSE</td>
+                    <td>Premises must be explicit</td>
+                </tr>
+                <tr>
+                    <td><span class="reg-badge reg-opinion">OPINION</span></td>
+                    <td>Subjective assessment, preference</td>
+                    <td>Actor must be declared</td>
+                </tr>
+                <tr>
+                    <td><span class="reg-badge reg-action">ACTION</span></td>
+                    <td>Action plan, execution chain</td>
+                    <td>Each step must follow from prior</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="cli-demo">
+    <div class="container">
+        <h2>CLI in Action</h2>
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <span class="terminal-title">~/.opencode</span>
+            </div>
+            <div class="terminal-body">
+<span class="prompt">$</span> <span class="cmd">sint status</span>
+
+<span class="output">  ╔══════════════════════════════════════╗</span>
+<span class="output">  ║       SINT-UA v2.1 — Memory          ║</span>
+<span class="output">  ╚══════════════════════════════════════╝</span>
+
+  <span class="highlight">Blocks:</span>     42
+  <span class="highlight">Chain:</span>      42 entries
+  <span class="highlight">Sessions:</span>   12
+  <span class="highlight">By register:</span>
+    <span class="output">FACT:</span> 18
+    <span class="output">SENSE:</span> 12
+    <span class="output">LOGIC:</span> 6
+
+  <span class="highlight">Current Focus:</span>
+    1. <span class="output">DSA</span> — Add DSP chain + 3D spatialization
+
+<span class="prompt">$</span> <span class="cmd">sint drift</span>
+
+<span class="output">  Register Distribution:</span>
+    <span class="output">FACT     ████████████████████ 45.0%</span> (expected 35.0%)
+    <span class="output">SENSE    ██████████ 22.0%</span> (expected 25.0%)
+    <span class="output">LOGIC    █████ 14.0%</span> (expected 20.0%)
+
+<span class="output">  ✓ No drift detected</span>
+
+<span class="prompt">$</span> <span class="cmd">sint trace 0042</span>
+
+<span class="output">  ◀ 0000 SENSE: Memory system initialized</span>
+<span class="output">  → 0001 FACT: Arena + SoA for audio mixer</span>
+<span class="output">  → 0002 FACT: C++ ABI symbols exported</span>
+<span class="output">  → 0003 FACT: FMOD Studio mapping</span>
+<span class="output">  ▶ 0004 FACT: DSA 3D attenuation verified</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="container">
+        <h2>By the Numbers</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">16</div>
+                <div class="stat-label">MCP Tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Semantic Registers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Agents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Novel Algorithms</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p>SINT-UA v2.1 — Built with OpenCode · <a href="https://github.com/kostyk348/sint-ua-v2.1" style="color: var(--accent);">GitHub</a></p>
+    </div>
+</footer>
+
+</body>
+</html>
