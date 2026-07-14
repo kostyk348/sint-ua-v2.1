@@ -1,6 +1,11 @@
 # SINT-UA v2.1 — Agent Memory System for OpenCode
 
-A structured memory system with hash-chain provenance, temporal decay, drift detection, and provenance archaeology for OpenCode agents.
+[![GitHub](https://img.shields.io/badge/github-kostyk348%2Fsint--ua--v2.1-181717?logo=github)](https://github.com/kostyk348/sint-ua-v2.1)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://python.org)
+[![OpenCode](https://img.shields.io/badge/OpenCode-compatible-purple)](https://opencode.ai)
+
+A structured memory system with hash-chain provenance, temporal decay, drift detection, provenance archaeology, vector embeddings, and git integration for OpenCode agents.
 
 ## What This Is
 
@@ -11,6 +16,8 @@ This is not another prompt template. This is **infrastructure** for AI agent mem
 - **Temporal decay** — memory blocks "cool down" over time like human memory
 - **Drift detection** — monitors when agent starts hallucinating or losing register discipline
 - **Provenance archaeology** — trace any decision back to its root facts
+- **Vector embeddings** — semantic search with sentence-transformers
+- **Git integration** — link memory blocks to git commits for audit trail
 
 ## Architecture
 
@@ -55,7 +62,7 @@ This is not another prompt template. This is **infrastructure** for AI agent mem
 
 ### MCP Server
 
-Python MCP server providing 16 tools for memory operations:
+Python MCP server providing 20 tools for memory operations:
 
 ```
 memory_read_state          memory_write_block
@@ -65,7 +72,9 @@ memory_search              memory_verify_chain
 memory_get_chain_tail      memory_stats
 memory_apply_decay         memory_heat_block
 memory_relevance_tiers     memory_drift_check
-memory_trace_provenance    (and more)
+memory_trace_provenance    git_link_blocks
+git_trace_block            git_timeline
+embeddings_index           embeddings_search
 ```
 
 ### CLI Tool (`sint`)
@@ -80,7 +89,26 @@ sint add <reg> <text> # Add new block
 sint decay           # Apply temporal decay
 sint drift           # Drift detection
 sint trace <id>      # Provenance archaeology
+sint git link        # Link blocks to git commits
+sint git timeline    # Combined block + commit timeline
 sint dashboard       # Full dashboard
+```
+
+### Vector Embeddings (`sint-embeddings`)
+
+```bash
+sint-embeddings index       # Build/update embedding index
+sint-embeddings search <q>  # Semantic search
+sint-embeddings similar <id> # Find similar blocks
+```
+
+### Git Integration (`sint-git`)
+
+```bash
+sint-git link         # Link blocks to git commits
+sint-git trace <id>   # Trace block through git history
+sint-git timeline     # Combined timeline
+sint-git info         # Current commit details
 ```
 
 ### Plugin (`sint-hooks`)
@@ -175,6 +203,28 @@ sint trace 0042  # Full reasoning chain
 sint trace 0042 --tree  # Dependency tree
 ```
 
+### Vector Embeddings
+
+Semantic search using sentence-transformers with `all-MiniLM-L6-v2` (384-dim):
+
+```bash
+sint-embeddings search "3D audio attenuation"  # Returns top 10 similar blocks
+sint-embeddings similar 0005  # Find blocks similar to block 0005
+```
+
+Embedding index stored at `.opencode/memory/embeddings/`.
+
+### Git Integration
+
+Link memory blocks to git commits for complete audit trail:
+
+```bash
+sint git link         # Link blocks to recent commits by timestamp
+sint git trace 0042   # Show git commits linked to block
+sint git timeline     # Combined memory + git timeline
+sint git info         # Current commit details
+```
+
 ## Setup
 
 ### 1. Copy to your project
@@ -190,7 +240,7 @@ cp .opencode/bin/sint /usr/local/bin/
 ### 2. Install dependencies
 
 ```bash
-pip install mcp
+pip install mcp sentence-transformers faiss-cpu
 ```
 
 ### 3. Update opencode.json
