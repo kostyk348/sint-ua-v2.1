@@ -9,3 +9,4 @@ memory/chain.jsonl
 memory/state.json
 memory/drift_*.jsonl
 memory/drift_baseline.json
+bin/opencode
