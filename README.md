@@ -1,3 +1,10 @@
+> **DEPRECATED** — This repo has been merged into the monorepo:  
+> **[kostyk348/sint](https://github.com/kostyk348/sint)** → `core/`  
+>  
+> This repository is archived for reference only. Active development continues in the monorepo.
+
+---
+
 # SINT-UA v2.1 — Agent Memory System for OpenCode
 
 [![GitHub](https://img.shields.io/badge/github-kostyk348%2Fsint--ua--v2.1-181717?logo=github)](https://github.com/kostyk348/sint-ua-v2.1)
