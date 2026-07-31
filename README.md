@@ -350,4 +350,4 @@ sint trace 0042
 
 ## License
 
-MIT
+Apache 2.0
