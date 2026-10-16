@@ -1,6 +1,6 @@
-> **DEPRECATED** — This repo has been merged into the monorepo:  
-> **[kostyk348/sint](https://github.com/kostyk348/sint)** → `core/`  
->  
+> **DEPRECATED** — This repo has been merged into the monorepo:
+> **[kostyk348/sint](https://github.com/kostyk348/sint)** → `core/`
+>
 > This repository is archived for reference only. Active development continues in the monorepo.
 
 ---
@@ -11,6 +11,9 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-blue)](https://python.org)
 [![OpenCode](https://img.shields.io/badge/OpenCode-compatible-purple)](https://opencode.ai)
+[![CI](https://github.com/kostyk348/sint-ua-v2.1/actions/workflows/ci.yml/badge.svg)](https://github.com/kostyk348/sint-ua-v2.1/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/kostyk348/sint-ua-v2.1?sort=semver&color=blue)](https://github.com/kostyk348/sint-ua-v2.1/releases)
+[![Last commit](https://img.shields.io/github/last-commit/kostyk348/sint-ua-v2.1?branch=master)](https://github.com/kostyk348/sint-ua-v2.1/commits/master)
 
 A structured memory system with hash-chain provenance, temporal decay, drift detection, provenance archaeology, vector embeddings, and git integration for OpenCode agents.
 
@@ -275,6 +278,7 @@ Add to your `opencode.json`:
 
 ```bash
 # Changes require restart
+
 opencode
 ```
 
@@ -293,11 +297,13 @@ After setup, `sint-main` runs automatically:
 
 ```bash
 # Terminal
+
 sint status
 sint drift
 sint trace 0042
 
 # In OpenCode
+
 /session-start
 /verify this claim
 /memory "3D attenuation"
