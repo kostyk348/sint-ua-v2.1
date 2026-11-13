@@ -1,11 +1,10 @@
-> **DEPRECATED** — This repo has been merged into the monorepo:
-> **[kostyk348/sint](https://github.com/kostyk348/sint)** → `core/`
->
-> This repository is archived for reference only. Active development continues in the monorepo.
+<div align="center">
 
----
+<img src="docs/banner.svg" alt="sint-ua-v2.1 banner" width="1000">
 
 # SINT-UA v2.1 — Agent Memory System for OpenCode
+
+### A structured memory system with hash-chain provenance, temporal decay, drift detection, provenance archaeology, vector embeddings, and git integration for…
 
 [![GitHub](https://img.shields.io/badge/github-kostyk348%2Fsint--ua--v2.1-181717?logo=github)](https://github.com/kostyk348/sint-ua-v2.1)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -15,7 +14,10 @@
 [![Release](https://img.shields.io/github/v/release/kostyk348/sint-ua-v2.1?sort=semver&color=blue)](https://github.com/kostyk348/sint-ua-v2.1/releases)
 [![Last commit](https://img.shields.io/github/last-commit/kostyk348/sint-ua-v2.1?branch=master)](https://github.com/kostyk348/sint-ua-v2.1/commits/master)
 
-A structured memory system with hash-chain provenance, temporal decay, drift detection, provenance archaeology, vector embeddings, and git integration for OpenCode agents.
+</div>
+
+---
+
 
 ## What This Is
 
